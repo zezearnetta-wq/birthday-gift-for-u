@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brankas Rahasia</title>
+    <style>
+        body {
+            background-color: #0d1117;
+            color: #c9d1d9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* Tampilan Brankas / Keypad */
+        #login-screen {
+            text-align: center;
+            border: 2px solid #00f2ff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
+        }
+
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 15px;
+            font-size: 18px;
+            background: #161b22;
+            color: white;
+            border: 1px solid #30363d;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:active { background: #00f2ff; color: black; }
+
+        #pin-display {
+            font-size: 24px;
+            letter-spacing: 10px;
+            margin-bottom: 10px;
+            height: 30px;
+            color: #00f2ff;
+        }
+
+        /* Tampilan Pesan Rahasia (Hidden di awal) */
+        #secret-content {
+            display: none;
+            max-width: 600px;
+            padding: 20px;
+            border: 2px solid #ff007a;
+            border-radius: 15px;
+            background: rgba(255, 0, 122, 0.05);
+            animation: fadeIn 1s ease-in;
+        }
+
+        .photo-frame {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+
+        .photo-frame img {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border: 3px solid white;
+            transform: rotate(-3deg);
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <div id="login-screen">
+        <h2>BRANKAS RAHASIA</h2>
+        <p>STATUS: TERKUNCI</p>
+        <div id="pin-display"></div>
+        <div class="keypad">
+            <button onclick="press(1)">1</button>
+            <button onclick="press(2)">2</button>
+            <button onclick="press(3)">3</button>
+            <button onclick="press(4)">4</button>
+            <button onclick="press(5)">5</button>
+            <button onclick="press(6)">6</button>
+            <button onclick="press(7)">7</button>
+            <button onclick="press(8)">8</button>
+            <button onclick="press(9)">9</button>
+            <button onclick="del()">DEL</button>
+            <button onclick="press(0)">0</button>
+            <button onclick="check()">OK</button>
+        </div>
+    </div>
+
+    <div id="secret-content">
+        <h1 style="color: #ff007a;">MISSION: LEVEL UP DAY! 🎂</h1>
+        <div class="photo-frame">
+            <img src="foto1.jpg" alt="Kita">
+            <img src="foto2.jpg" alt="Kita">
+        </div>
+        <p><b>Target:</b> My Favorite Human ❤️</p>
+        <p>Selamat ya! Kamu berhasil ngebobol sistem keamanan hati aku. <br><br>
+        Happy Birthday! Makasih udah jadi support system terbaik. Semoga tahun ini semua bug di hidupmu hilang dan diganti kebahagiaan terus!</p>
+        <p style="font-size: 0.8em; color: gray;">Sistem aktif 24/7 untuk menjaga perasaanmu.</p>
+    </div>
+
+    <script>
+        let currentPin = "";
+        const targetPin = "1234"; // GANTI PIN DI SINI
+
+        function press(num) {
+            if(currentPin.length < 4) {
+                currentPin += num;
+                document.getElementById("pin-display").innerText = "*".repeat(currentPin.length);
+            }
+        }
+
+        function del() {
+            currentPin = "";
+            document.getElementById("pin-display").innerText = "";
+        }
+
+        function check() {
+            if(currentPin === targetPin) {
+                document.getElementById("login-screen").style.display = "none";
+                document.getElementById("secret-content").style.display = "block";
+            } else {
+                alert("PIN SALAH! Coba lagi.");
+                del();
+            }
+        }
+    </script>
+</body>
+</html>
