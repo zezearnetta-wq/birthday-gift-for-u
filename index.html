@@ -3,12 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Brankas Rahasia</title>
+    <title>Happy Birthday Dave!</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
+        :root {
+            --orange: #ffa500;
+            --dark: #0d1117;
+        }
+
         body {
-            background-color: #0d1117;
+            background-color: var(--dark);
             color: #c9d1d9;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -17,113 +23,150 @@
             overflow: hidden;
         }
 
-        /* Tampilan Brankas / Keypad */
+        /* Tampilan Brankas */
         #login-screen {
             text-align: center;
-            border: 2px solid #00f2ff;
+            border: 2px solid var(--orange);
             padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
+            border-radius: 20px;
+            background: rgba(13, 17, 23, 0.9);
+            box-shadow: 0 0 30px rgba(255, 165, 0, 0.3);
+            backdrop-filter: blur(10px);
+            z-index: 10;
         }
 
         .keypad {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
+            gap: 12px;
             margin-top: 20px;
         }
 
         button {
-            padding: 15px;
-            font-size: 18px;
+            padding: 18px;
+            font-size: 20px;
             background: #161b22;
             color: white;
             border: 1px solid #30363d;
-            border-radius: 5px;
+            border-radius: 12px;
             cursor: pointer;
+            transition: all 0.2s;
         }
 
-        button:active { background: #00f2ff; color: black; }
+        button:active {
+            background: var(--orange);
+            color: black;
+            transform: scale(0.9);
+        }
 
         #pin-display {
-            font-size: 24px;
-            letter-spacing: 10px;
-            margin-bottom: 10px;
-            height: 30px;
-            color: #00f2ff;
+            font-size: 28px;
+            letter-spacing: 12px;
+            margin-bottom: 15px;
+            height: 35px;
+            color: var(--orange);
         }
 
-        /* Tampilan Pesan Rahasia (Hidden di awal) */
+        /* Tampilan Pesan Utama */
         #secret-content {
             display: none;
-            max-width: 600px;
-            padding: 20px;
-            border: 2px solid #ff007a;
-            border-radius: 15px;
-            background: rgba(255, 0, 122, 0.05);
-            animation: fadeIn 1s ease-in;
+            max-width: 450px;
+            padding: 35px;
+            border: 2px solid var(--orange);
+            border-radius: 25px;
+            background: rgba(255, 165, 0, 0.05);
+            box-shadow: 0 0 40px rgba(255, 165, 0, 0.1);
+            animation: slideUp 1s ease-out;
+            text-align: left;
+            position: relative;
+            overflow: hidden; /* Agar dekorasi tidak keluar kotak */
         }
 
-        .photo-frame {
-            display: flex;
-            gap: 10px;
+        /* Dekorasi Bergerak (Bunga & Kue) */
+        .decoration {
+            position: absolute;
+            font-size: 30px;
+            opacity: 0.8;
+            animation: floating 3s ease-in-out infinite;
+        }
+
+        .flower1 { top: 10px; right: 20px; animation-delay: 0s; }
+        .flower2 { bottom: 20px; left: 20px; animation-delay: 1.5s; }
+        .cake { top: 10px; left: 20px; animation-delay: 0.7s; }
+
+        .header-text {
+            color: var(--orange);
+            font-weight: 800;
+            font-size: 1.6em;
             margin-bottom: 20px;
-            overflow-x: auto;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,165,0,0.3);
+            padding-bottom: 10px;
         }
 
-        .photo-frame img {
-            width: 150px;
-            height: 150px;
-            object-fit: cover;
-            border: 3px solid white;
-            transform: rotate(-3deg);
+        .message-body {
+            line-height: 1.7;
+            font-size: 1.05em;
         }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        /* Animasi */
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes floating {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(10deg); }
+        }
+
+        .shake { animation: shake 0.4s; }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
     </style>
 </head>
 <body>
 
     <div id="login-screen">
-        <h2>BRANKAS RAHASIA</h2>
-        <p>STATUS: TERKUNCI</p>
+        <h2 style="color: var(--orange); margin-bottom: 5px;">🔐 BRANKAS RAHASIA</h2>
+        <p style="font-size: 0.8em; opacity: 0.6; margin-bottom: 20px;">RESTRICTED ACCESS</p>
         <div id="pin-display"></div>
         <div class="keypad">
-            <button onclick="press(1)">1</button>
-            <button onclick="press(2)">2</button>
-            <button onclick="press(3)">3</button>
-            <button onclick="press(4)">4</button>
-            <button onclick="press(5)">5</button>
-            <button onclick="press(6)">6</button>
-            <button onclick="press(7)">7</button>
-            <button onclick="press(8)">8</button>
-            <button onclick="press(9)">9</button>
-            <button onclick="del()">DEL</button>
-            <button onclick="press(0)">0</button>
-            <button onclick="check()">OK</button>
+            <button onclick="press(1)">1</button><button onclick="press(2)">2</button><button onclick="press(3)">3</button>
+            <button onclick="press(4)">4</button><button onclick="press(5)">5</button><button onclick="press(6)">6</button>
+            <button onclick="press(7)">7</button><button onclick="press(8)">8</button><button onclick="press(9)">9</button>
+            <button onclick="del()">CLR</button><button onclick="press(0)">0</button><button onclick="check()">OK</button>
         </div>
     </div>
 
     <div id="secret-content">
-        <h1 style="color: #ff007a;">MISSION: LEVEL UP DAY! 🎂</h1>
-        <div class="photo-frame">
-            <img src="foto1.jpg" alt="Kita">
-            <img src="foto2.jpg" alt="Kita">
+        <div class="decoration cake">🎂</div>
+        <div class="decoration flower1">🌸</div>
+        <div class="decoration flower2">🌻</div>
+
+        <div class="header-text">Happy Level Up Day Dave!</div>
+        
+        <div class="message-body">
+            <p>🎯 <b>Target:</b> nasi goreng</p>
+            <p style="font-size: 1.1em; font-weight: bold; color: var(--orange); margin-top: 20px;">Happy Birthday Dave!</p>
+            <p>I’m so glad we found our way back to each other. It’s been so much fun doing all these new things together lately and it really feels like a brand new chapter for us.</p>
+            <p>I just want to spend n enjoy my time with u, and I hope I can bring a little bit of color and happiness into your life. I wish u endless happy days ahead n a year of growth that makes u even better than u were yesterday. Enjoy your birthday!</p>
         </div>
-        <p><b>Target:</b> My Favorite Human ❤️</p>
-        <p>Selamat ya! Kamu berhasil ngebobol sistem keamanan hati aku. <br><br>
-        Happy Birthday! Makasih udah jadi support system terbaik. Semoga tahun ini semua bug di hidupmu hilang dan diganti kebahagiaan terus!</p>
-        <p style="font-size: 0.8em; color: gray;">Sistem aktif 24/7 untuk menjaga perasaanmu.</p>
+        
+        <p style="font-size: 0.7em; color: #8b949e; text-align: right; margin-top: 25px; font-style: italic;">With love, for your special day.</p>
     </div>
 
     <script>
         let currentPin = "";
-        const targetPin = "1234"; // GANTI PIN DI SINI
+        const targetPin = "1207";
 
         function press(num) {
             if(currentPin.length < 4) {
                 currentPin += num;
-                document.getElementById("pin-display").innerText = "*".repeat(currentPin.length);
+                document.getElementById("pin-display").innerText = "•".repeat(currentPin.length);
             }
         }
 
@@ -134,10 +177,18 @@
 
         function check() {
             if(currentPin === targetPin) {
+                confetti({
+                    particleCount: 150,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#ffa500', '#ffffff']
+                });
                 document.getElementById("login-screen").style.display = "none";
                 document.getElementById("secret-content").style.display = "block";
             } else {
-                alert("PIN SALAH! Coba lagi.");
+                document.getElementById("login-screen").classList.add("shake");
+                setTimeout(() => document.getElementById("login-screen").classList.remove("shake"), 400);
+                alert("KODE SALAH!");
                 del();
             }
         }
