@@ -1,129 +1,129 @@
-import streamlit as st
-import time
-
-# Konfigurasi Halaman
-st.set_page_config(page_title="For Dave", page_icon="🧡", layout="centered")
-
-# --- CSS UNTUK ANIMASI & GAYA ---
-st.markdown("""
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Dave!</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-    .stApp { background-color: #0d1117; color: #ffa500; }
-    .stButton>button {
-        width: 100%; border-radius: 10px; border: 1px solid #ffa500;
-        background-color: #161b22; color: #ffa500; height: 3em;
-    }
-    .stButton>button:hover { background-color: #ffa500; color: black; }
-    
-    /* Animasi Melayang untuk Bunga/Kue */
-    @keyframes floating {
-        0% { transform: translateY(0px) rotate(0deg); }
-        50% { transform: translateY(-15px) rotate(5deg); }
-        100% { transform: translateY(0px) rotate(0deg); }
-    }
-    .floating-icon {
-        font-size: 50px; text-align: center;
-        animation: floating 3s ease-in-out infinite;
-    }
-    .photo-card {
-        background: #161b22; padding: 10px; border-radius: 15px;
-        border: 1px solid #30363d; margin-bottom: 20px; text-align: center;
-    }
+        :root { --orange: #ffa500; --dark: #0d1117; --card: #161b22; }
+        body { background-color: var(--dark); color: #c9d1d9; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; overflow: hidden; }
+
+        /* Countdown Style */
+        #countdown-screen { display: none; text-align: center; }
+        .big-text { font-size: 80px; font-weight: bold; color: var(--orange); animation: zoom 1s infinite; }
+
+        /* Brankas */
+        #login-screen { text-align: center; border: 2px solid var(--orange); padding: 30px; border-radius: 20px; background: rgba(13, 17, 23, 0.9); box-shadow: 0 0 30px rgba(255, 165, 0, 0.3); }
+        .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px; }
+        button { padding: 15px; font-size: 18px; background: var(--card); color: white; border: 1px solid #30363d; border-radius: 10px; cursor: pointer; }
+        #pin-display { font-size: 24px; letter-spacing: 10px; margin-bottom: 15px; color: var(--orange); height: 30px; }
+
+        /* Dashboard */
+        #main-dashboard { display: none; width: 90%; max-width: 500px; height: 90vh; overflow-y: auto; padding: 20px; animation: fadeIn 1s; }
+        .nav-menu { display: flex; justify-content: space-around; background: var(--card); padding: 15px; border-radius: 15px; margin-bottom: 20px; border: 1px solid var(--orange); position: sticky; top: 0; z-index: 10; }
+        .blog-content { background: var(--card); padding: 20px; border-radius: 20px; border: 1px solid #30363d; margin-bottom: 20px; display: none; text-align: center; }
+        .blog-content.active { display: block; animation: slideUp 0.5s; }
+
+        /* Foto dengan Teks */
+        .photo-item { margin-bottom: 25px; background: #0d1117; padding: 10px; border-radius: 15px; }
+        .photo-item img { width: 100%; border-radius: 10px; margin-bottom: 10px; border: 2px solid var(--orange); }
+        .photo-text { font-style: italic; font-size: 0.9em; color: #ffa500; }
+
+        .floating-icon { font-size: 40px; animation: float 3s infinite; margin: 10px; }
+        @keyframes zoom { 0% { transform: scale(0.5); } 100% { transform: scale(1.2); } }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     </style>
-    """, unsafe_allow_html=True)
+</head>
+<body>
 
-# --- LOGIKA SESSION ---
-if 'step' not in st.session_state:
-    st.session_state.step = "login"
+    <div id="login-screen">
+        <h2 style="color: var(--orange);">🔐 KODE AKSES</h2>
+        <div id="pin-display"></div>
+        <div class="keypad">
+            <button onclick="press(1)">1</button><button onclick="press(2)">2</button><button onclick="press(3)">3</button>
+            <button onclick="press(4)">4</button><button onclick="press(5)">5</button><button onclick="press(6)">6</button>
+            <button onclick="press(7)">7</button><button onclick="press(8)">8</button><button onclick="press(9)">9</button>
+            <button onclick="del()">CLR</button><button onclick="press(0)">0</button><button onclick="check()">OK</button>
+        </div>
+    </div>
 
-# --- 1. TAMPILAN LOGIN (PIN 1207) ---
-if st.session_state.step == "login":
-    st.markdown("<h2 style='text-align: center;'>🔐 KODE AKSES</h2>", unsafe_allow_html=True)
-    pin = st.text_input("Masukkan PIN:", type="password", placeholder="****")
-    if st.button("BUKA BRANKAS"):
-        if pin == "1207":
-            st.session_state.step = "countdown"
-            st.rerun()
-        else:
-            st.error("No no dave")
+    <div id="countdown-screen">
+        <div id="count-text" class="big-text"></div>
+    </div>
 
-# --- 2. ANIMASI COUNTDOWN & TEXT (MIMIC VIDEO) ---
-elif st.session_state.step == "countdown":
-    placeholder = st.empty()
-    # Countdown
-    for i in ["3", "2", "1"]:
-        placeholder.markdown(f"<h1 style='text-align: center; font-size: 100px;'>{i}</h1>", unsafe_allow_html=True)
-        time.sleep(1)
-    
-    # Text Sequence
-    for word in ["Happy", "Birthday", "Dave"]:
-        placeholder.markdown(f"<h1 style='text-align: center; font-size: 80px;'>{word}</h1>", unsafe_allow_html=True)
-        time.sleep(1.2)
-    
-    st.session_state.step = "dashboard"
-    st.rerun()
+    <div id="main-dashboard">
+        <div class="nav-menu">
+            <div onclick="openTab('tab-msg')">📝</div>
+            <div onclick="openTab('tab-photo')">📸</div>
+            <div onclick="openTab('tab-spot')">🎵</div>
+        </div>
 
-# --- 3. DASHBOARD UTAMA (BLOG SYSTEM) ---
-elif st.session_state.step == "dashboard":
-    st.balloons()
-    
-    # Sidebar / Menu
-    menu = st.tabs(["📝 Message", "📸 Photo Album", "🎵 Spotify"])
+        <div id="tab-msg" class="blog-content active">
+            <div class="floating-icon">🎂🌸🌻</div>
+            <h3>Happy Level Up Day Dave!</h3>
+            <p><b>To:</b> nasi goreng</p>
+            <hr>
+            <p style="text-align: left;">Happy Birthday Dave! <br><br>I’m so glad we found our way back to each other. It’s been so much fun doing all these new things together lately and it really feels like a brand new chapter for us. I just want to spend n enjoy my time with u, and I hope I can bring a little bit of color and happiness into your life. I wish u endless happy days ahead n a year of growth that makes u even better than u were yesterday. Enjoy your birthday! ❤️</p>
+        </div>
 
-    # --- TAB 1: MESSAGE (DENGAN ANIMASI) ---
-    with menu[0]:
-        st.markdown("<div class='floating-icon'>🎂🌸🌻</div>", unsafe_allow_html=True)
-        st.markdown("""
-        ### Happy Level Up Day Dave!
-        **To:** Nasi Goreng
-        
-        Happy Birthday Dave! 
-        
-        I’m so glad we found our way back to each other. It’s been so much fun doing all these new things together lately and it really feels like a brand new chapter for us. 
-        I just want to spend n enjoy my time with u, and I hope I can bring a little bit of color and happiness into your life. 
-        I wish u endless happy days ahead n a year of growth that makes u even better than u were yesterday. 
-        
-        Enjoy your birthday! ❤️
-        """, unsafe_allow_html=True)
+        <div id="tab-photo" class="blog-content">
+            <div class="photo-item">
+                <img src="foto1.jpg.jpeg" alt="Foto 1">
+                <p class="photo-text">"ini pap kmu yg paling bener depoy!"</p>
+            </div>
+            <div class="photo-item">
+                <img src="foto2.jpg.jpeg" alt="Foto 2">
+                <p class="photo-text">"one of my fav pic of u (walaupun alay dikit)"</p>
+            </div>
+            <div class="photo-item">
+                <img src="foto3.jpg.jpeg" alt="Foto 3">
+                <p class="photo-text">finilly we go out together again after the last time nonton waktu akhir smp haha "</p>
+            </div>
+        </div>
 
-    # --- TAB 2: PHOTO ALBUM (SLIDER/GRID DENGAN TEXT) ---
-    with menu[1]:
-        st.write("### Our Memories")
-        
-        # Foto 1
-        with st.container():
-            st.markdown("<div class='photo-card'>", unsafe_allow_html=True)
-            st.image("foto1.jpg.jpeg", use_column_width=True)
-            st.write("*ini pap paling bener yg pernah kmu kasi depoy.. (isi pesanmu di sini)*")
-            st.markdown("</div>", unsafe_allow_html=True)
+        <div id="tab-spot" class="blog-content">
+            <img src="https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?q=80&w=200" style="border-radius: 50%; animation: float 5s infinite;" width="150">
+            <h4>friendship should be fun right.. 🎧</h4>
+            <iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/1di1S6btxkLcO679vTStiG?utm_source=generator&theme=0" width="100%" height="152" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
+        </div>
+    </div>
 
-        # Foto 2
-        with st.container():
-            st.markdown("<div class='photo-card'>", unsafe_allow_html=True)
-            st.image("foto2.jpg.jpeg", use_column_width=True)
-            st.write("*one of my fav pic (walaupun kek alay)*")
-            st.markdown("</div>", unsafe_allow_html=True)
+    <script>
+        let currentPin = "";
+        const targetPin = "1207";
 
-        # Foto 3
-        with st.container():
-            st.markdown("<div class='photo-card'>", unsafe_allow_html=True)
-            st.image("foto3.jpg.jpeg", use_column_width=True)
-            st.write("*finally we can go out bareng lgi after last time nonton bareng waktu akhir smp haha*")
-            st.markdown("</div>", unsafe_allow_html=True)
+        function press(n) { if(currentPin.length<4) { currentPin+=n; document.getElementById('pin-display').innerText+='•'; } }
+        function del() { currentPin=""; document.getElementById('pin-display').innerText=""; }
 
-    # --- TAB 3: SPOTIFY (ALBUM ART DULU BARU PLAYER) ---
-    with menu[2]:
-        st.write("### Our Soundtrack 🎧")
-        
-        # Simulasi Album Art
-        st.image("https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?q=80&w=500", caption="friendship should be fun right..")
-        
-        st.write("---")
-        
-        # Spotify Player
-        st.markdown(f"""
-            <iframe style="border-radius:12px" 
-            src="https://open.spotify.com/embed/track/4" 
-            width="100%" height="152" frameBorder="0" allowfullscreen="" 
-            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
-            loading="lazy"></iframe>
-            """, unsafe_allow_html=True)
+        function check() {
+            if(currentPin === targetPin) {
+                document.getElementById('login-screen').style.display='none';
+                startCountdown();
+            } else { alert("no no dave!"); del(); }
+        }
+
+        async function startCountdown() {
+            const scr = document.getElementById('countdown-screen');
+            const txt = document.getElementById('count-text');
+            scr.style.display='block';
+            
+            const sequence = ["3", "2", "1", "Happy", "Birthday", "Dave"];
+            for (let s of sequence) {
+                txt.innerText = s;
+                await new Promise(r => setTimeout(r, 1000));
+            }
+            
+            scr.style.display='none';
+            document.getElementById('main-dashboard').style.display='block';
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#ffa500', '#ffffff'] });
+        }
+
+        function openTab(id) {
+            document.querySelectorAll('.blog-content').forEach(c => c.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+    </script>
+</body>
+</html>
