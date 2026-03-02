@@ -1,129 +1,92 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>For Dave</title>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <style>
-        :root { --orange: #ffa500; --dark: #0d1117; --card: #161b22; }
-        body { background-color: var(--dark); color: #c9d1d9; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; overflow-x: hidden; }
+import tkinter as tk
+from tkinter import messagebox
+import webbrowser
+import time
 
-        /* Brankas */
-        #login-screen { text-align: center; border: 2px solid var(--orange); padding: 30px; border-radius: 20px; background: rgba(13, 17, 23, 0.9); box-shadow: 0 0 30px rgba(255, 165, 0, 0.3); z-index: 100; }
-        .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px; }
-        button { padding: 15px; font-size: 18px; background: var(--card); color: white; border: 1px solid #30363d; border-radius: 10px; cursor: pointer; }
-        button:active { background: var(--orange); color: black; }
-        #pin-display { font-size: 24px; letter-spacing: 10px; margin-bottom: 15px; color: var(--orange); height: 30px; }
+class BirthdayApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Birthday Surprise for Dave")
+        self.root.geometry("500x700")
+        self.root.configure(background='#121212') # Tema gelap seperti Spotify
 
-        /* Dashboard Utama */
-        #main-dashboard { display: none; width: 90%; max-width: 500px; animation: fadeIn 1s; }
+        self.index = 0
+        self.messages = ["1", "2", "3", "Happy", "Birthday", "Dave"]
         
-        /* Menu Tab (Blog) */
-        .nav-menu { display: flex; justify-content: space-around; background: var(--card); padding: 10px; border-radius: 15px; margin-bottom: 20px; border: 1px solid var(--orange); }
-        .nav-item { cursor: pointer; font-size: 20px; transition: 0.3s; opacity: 0.5; }
-        .nav-item.active { opacity: 1; transform: scale(1.2); }
+        # Pesan dari blog sebelumnya (BioSim-Pop) [cite: 24, 25]
+        self.blog_message = (
+            "Proyek 'BioSim-Pop' adalah langkah nyata integrasi teknologi. "
+            "Semoga harimu penuh dengan eksplorasi dinamis seperti simulasi kita!"
+        )
 
-        /* Konten Blog */
-        .blog-content { background: var(--card); padding: 20px; border-radius: 20px; border: 1px solid #30363d; min-height: 300px; display: none; position: relative; }
-        .blog-content.active { display: block; animation: slideUp 0.5s; }
+        # Label Utama untuk Animasi Teks
+        self.label = tk.Label(root, text="", font=("Helvetica", 32, "bold"), 
+                              fg="#1DB954", bg="#121212")
+        self.label.pack(expand=True)
 
-        /* Foto Slider (Bisa Digeser) */
-        .photo-slider { display: flex; overflow-x: auto; snap-type: x mandatory; gap: 10px; scroll-behavior: smooth; border-radius: 15px; }
-        .photo-slider img { width: 100%; flex-shrink: 0; snap-align: center; border-radius: 15px; object-fit: cover; height: 300px; }
-        .slider-hint { font-size: 0.7em; text-align: center; margin-top: 10px; color: var(--orange); }
+        # Tombol Mulai
+        self.start_button = tk.Button(root, text="Buka Kejutan", command=self.start_animation,
+                                      bg="#1DB954", fg="white", font=("Helvetica", 12, "bold"))
+        self.start_button.pack(pady=20)
 
-        /* Spotify Wrapper */
-        .spotify-container { border-radius: 15px; overflow: hidden; }
+    def start_animation(self):
+        """Menjalankan urutan 1, 2, 3, Happy, Birthday, Dave"""
+        self.start_button.destroy()
+        self.show_next_text()
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-    </style>
-</head>
-<body>
+    def show_next_text(self):
+        if self.index < len(self.messages):
+            self.label.config(text=self.messages[self.index])
+            self.index += 1
+            # Kecepatan transisi teks (1 detik)
+            self.root.after(1000, self.show_next_text)
+        else:
+            self.show_final_content()
 
-    <div id="login-screen">
-        <h2 style="color: var(--orange);">🔐 KODE AKSES</h2>
-        <div id="pin-display"></div>
-        <div class="keypad">
-            <button onclick="press(1)">1</button><button onclick="press(2)">2</button><button onclick="press(3)">3</button>
-            <button onclick="press(4)">4</button><button onclick="press(5)">5</button><button onclick="press(6)">6</button>
-            <button onclick="press(7)">7</button><button onclick="press(8)">8</button><button onclick="press(9)">9</button>
-            <button onclick="del()">CLR</button><button onclick="press(0)">0</button><button onclick="check()">OK</button>
-        </div>
-    </div>
+    def show_final_content(self):
+        """Menampilkan pesan blog, animasi bunga, dan blok foto"""
+        self.label.destroy()
+        
+        # 1. Animasi Pesan Blog (Pengganti Love)
+        blog_label = tk.Label(self.root, text=self.blog_message, wraplength=400,
+                              font=("Courier", 12, "italic"), fg="#FFD700", bg="#121212")
+        blog_label.pack(pady=20)
 
-    <div id="main-dashboard">
-        <div class="nav-menu">
-            <div class="nav-item active" onclick="openTab('tab-message')">📝</div>
-            <div class="nav-item" onclick="openTab('tab-photo')">📸</div>
-            <div class="nav-item" onclick="openTab('tab-spotify')">🎵</div>
-        </div>
+        # 2. Representasi Animasi (Bunga/Kue)
+        # Di sini kita menggunakan simbol karakter untuk interaksi sederhana
+        self.canvas = tk.Canvas(self.root, width=200, height=100, bg="#121212", highlightthickness=0)
+        self.canvas.pack()
+        self.flower = self.canvas.create_text(100, 50, text="🌸✨🌷", font=("Helvetica", 40))
+        self.animate_flower()
 
-        <div id="tab-message" class="blog-content active">
-            <h3 style="color: var(--orange);">Happy Birthday Dave! 🎂</h3>
-            <p><b>Target:</b> nasi goreng</p>
-            <hr style="border: 0.5px solid #30363d;">
-            <p style="line-height: 1.6; font-size: 0.95em;">
-                I’m so glad we found our way back to each other. It’s been so much fun doing all these new things together lately and it really feels like a brand new chapter for us.<br><br>
-                I just want to spend n enjoy my time with u, and I hope I can bring a little bit of color and happiness into your life. I wish u endless happy days ahead n a year of growth that makes u even better than u were yesterday. Enjoy your birthday!
-            </p>
-        </div>
+        # 3. Blok Foto & Input Message
+        tk.Label(self.root, text="[ Foto Dave Di Sini ]", bg="grey", width=30, height=10).pack(pady=10)
+        
+        tk.Label(self.root, text="pap paling bener yang pernah kmu kirim ke aku:", fg="white", bg="#121212").pack()
+        self.user_message = tk.Entry(self.root, width=40)
+        self.user_message.pack(pady=5)
+        
+        # 4. Spotify Section (Album Image -> Link)
+        tk.Label(self.root, text="friendship should be fun right..:", fg="white", bg="#121212").pack(pady=10)
+        
+        # Simulasi Gambar Album
+        album_btn = tk.Button(self.root, text="🎵 LIHAT ALBUM 🎵", 
+                              command=self.open_spotify, bg="#191414", fg="#1DB954")
+        album_btn.pack(pady=5)
 
-        <div id="tab-photo" class="blog-content">
-            <div class="photo-slider">
-                <img src="foto1.jpg.jpeg" alt="Foto 1">
-                <img src="foto2.jpg.jpeg" alt="Foto 2">
-                <img src="foto3.jpg.jpeg" alt="Foto 3">
-            </div>
-            <p class="slider-hint">← Geser untuk lihat foto lainnya →</p>
-        </div>
+    def animate_flower(self):
+        """Animasi sederhana bunga membesar dan mengecil"""
+        current_font_size = int(self.canvas.itemcget(self.flower, "font").split()[1])
+        new_size = 45 if current_font_size == 40 else 40
+        self.canvas.itemconfig(self.flower, font=("Helvetica", new_size))
+        self.root.after(500, self.animate_flower)
 
-        <div id="tab-spotify" class="blog-content">
-            <h4 style="text-align: center;">Our Soundtrack 🎧</h4>
-            <div class="spotify-container">
-                <iframe style="border-radius:12px" src="https://open.spotify.com/track/35o9a4iAfLl5jRmqMX9c1D?si=9DKm--9eTZiWvLqSDpnqOQ" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
-            </div>
-            <p style="font-size: 0.8em; margin-top: 15px; text-align: center;">"friendship should be fun right..."</p>
-        </div>
-    </div>
+    def open_spotify(self):
+        """Mengarahkan ke link Spotify"""
+        webbrowser.open("https://open.spotify.com/track/35o9a4iAfLl5jRmqMX9c1D?si=9DKm--9eTZiWvLqSDpnqOQ") # Ganti dengan link playlist Dave
+        messagebox.showinfo("Spotify", "Membuka link Spotify...")
 
-    <script>
-        let currentPin = "";
-        const targetPin = "1207";
-
-        function press(num) {
-            if(currentPin.length < 4) {
-                currentPin += num;
-                document.getElementById("pin-display").innerText = "•".repeat(currentPin.length);
-            }
-        }
-        function del() { currentPin = ""; document.getElementById("pin-display").innerText = ""; }
-
-        function check() {
-            if(currentPin === targetPin) {
-                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#ffa500', '#ffffff'] });
-                document.getElementById("login-screen").style.display = "none";
-                document.getElementById("main-dashboard").style.display = "block";
-            } else {
-                alert("TENG! KODE SALAH!");
-                del();
-            }
-        }
-
-        function openTab(tabId) {
-            // Sembunyikan semua konten
-            document.querySelectorAll('.blog-content').forEach(content => {
-                content.classList.remove('active');
-            });
-            // Matikan semua icon nav
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            // Aktifkan yang dipilih
-            document.getElementById(tabId).classList.add('active');
-            event.currentTarget.classList.add('active');
-        }
-    </script>
-</body>
-</html>
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = BirthdayApp(root)
+    root.mainloop()
